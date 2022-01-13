@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "crypton",
+    "password": "12345",
+    "database": "crypton_task",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "crypton",
+    "password": "12345",
+    "database": "crypton_task",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "crypton",
+    "password": "12345",
+    "database": "crypton_task",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  }
+}
