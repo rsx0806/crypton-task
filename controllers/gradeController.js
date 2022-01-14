@@ -6,7 +6,9 @@ module.exports = {
     },
     async getAverageGrade(req,res){
         let path = req.path.split('/');
+        path.pop();
         let criteria = path.slice(-1).toString();
+        console.log(criteria);
         switch (criteria) {
             case 'student':{
                 return await gradeService.getAverageByStudent(req,res);
@@ -25,7 +27,7 @@ module.exports = {
                 break;
             }
             default:{
-                return await gradeService.getAllGrades(req,res);
+                return { "error": "Error in criteria case selection" };
                 break;
             }
         }

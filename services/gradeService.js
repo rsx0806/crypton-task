@@ -1,4 +1,5 @@
 "use strict"
+const {Sequelize} = require("sequelize");
 const Users = require("../sequelize/models").Users;
 const Profiles = require("../sequelize/models").Profiles;
 const Grades = require('../sequelize/models/').Grades;
@@ -65,6 +66,8 @@ module.exports = {
         let from = await Users.findOne({where: {username:actor},raw:true});
         let fromProfile = await Profiles.findOne({where: {user_id:from.id},raw:true});
         if(fromProfile.group == null && fromProfile.faculty == req.params.faculty){
+            let students = await  Grades.findAll({where:{faculty:req.params.faculty},raw:true})
+            console.log(students);
             let result = await Grades.findAll();
             return result;
         }else{
@@ -99,7 +102,10 @@ module.exports = {
         let from = await Users.findOne({where: {username:actor},raw:true});
         let fromProfile = await Profiles.findOne({where: {user_id:from.id},raw:true});
         if(fromProfile.group != null){
-            let result = await Grades.findAll({where :{lesson:req.params.lesson, student_id:fromProfile.id}});
+            let result = await Grades.findAll({
+                where :{lesson:req.params.lesson, student_id:fromProfile.id},
+                attributes: [[Sequelize.fn('avg', Sequelize.col('grade')),'avgGrade']]
+            });
             return result;
         }else{
             return { "error": "Only for students" };
