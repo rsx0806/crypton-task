@@ -93,8 +93,13 @@ module.exports = {
         let actor = JSON.parse(jsonPayload)['user']['username'];
         let from = await Users.findOne({where: {username:actor},raw:true});
         let fromProfile = await Profiles.findOne({where: {user_id:from.id},raw:true});
-        if(fromProfile.group == null){
-            let result = await Grades.findAll();
+        let checkProfile = await Profiles.findOne({where: {group:req.params.group},raw:true});
+        if(fromProfile.group == null && checkProfile.faculty == fromProfile.faculty && checkProfile.university == fromProfile.university){
+            let students = await  Profiles.findAll({where:{group:req.params.group},raw:true})
+            let idList = [];
+            students.forEach(element =>{
+                idList.push(element['id']);
+            })
             return result;
         }else{
             return { "error": "Teacher faculty+university and specified group faculty+university must be the same" };
