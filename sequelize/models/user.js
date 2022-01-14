@@ -1,22 +1,22 @@
-const {Sequelize} = require("sequelize");
-'use strict';
+const { Sequelize } = require('sequelize')
+'use strict'
 module.exports = (sequelize, DataTypes) => {
-  let Users = sequelize.define('Users', {
-    id: {type:DataTypes.UUID, defaultValue: Sequelize.UUIDV4, allowNull: false, primaryKey:true},
-    username: {type:DataTypes.STRING, allowNull:false},
-    email: {type:DataTypes.STRING , allowNull:false, unique:true},
-    password: {type:DataTypes.STRING, allowNull:false},
-    phone: {type:DataTypes.STRING, allowNull:false},
+  const Users = sequelize.define('Users', {
+    id: { type: DataTypes.UUID, defaultValue: Sequelize.UUIDV4, allowNull: false, primaryKey: true },
+    username: { type: DataTypes.STRING, allowNull: false },
+    email: { type: DataTypes.STRING, allowNull: false, unique: true },
+    password: { type: DataTypes.STRING, allowNull: false },
+    phone: { type: DataTypes.STRING, allowNull: false },
     dob: DataTypes.DATE,
     sex: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'Users'
-  });
+  })
   Users.associate = (models) => {
-    Users.hasOne(models.Profiles, {foreignKey: {name: "user_id"}});
+    Users.hasOne(models.Profiles, { foreignKey: { name: 'user_id' } })
   }
-  return Users;
+  return Users
 /*
   User.init({
     id: {type:DataTypes.UUID, primaryKey:true},
@@ -30,5 +30,5 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'User',
   });
-  return User;*/
-};
+  return User; */
+}

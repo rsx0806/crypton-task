@@ -4,86 +4,86 @@ const userController = require('../controllers/userController')
 const profileController = require('../controllers/profileController')
 const gradeController = require('../controllers/gradeController')
 const userService = require('../services/userService')
-const Joi = require('joi');
+const Joi = require('joi')
 
-//All the routes of the api will be defined here 
+// All the routes of the api will be defined here
 module.exports = [
-    {
-        method: 'GET',
-        path: '/',
-        handler: loginController.greetings,     //Specifying what controller to use
-        config: {                               //This will be used to display attributes in swagger ui
-            description: 'Welcome Route',
-            tags: ['api']
+  {
+    method: 'GET',
+    path: '/',
+    handler: loginController.greetings, // Specifying what controller to use
+    config: { // This will be used to display attributes in swagger ui
+      description: 'Welcome Route',
+      tags: ['api']
+    }
+  },
+  {
+    method: 'POST',
+    path: '/login',
+    handler: loginController.authenticate,
+    config: {
+      description: 'Authenticate User',
+      notes: 'Get jwt by providing email(jd@gmail.com) & password(test@123)',
+      tags: ['api'],
+      auth: false, // No auth for this end point
+      plugins: {
+        'hapi-swagger': {
+          payloadType: 'form'
         }
-    },
-    {
-        method: 'POST',
-        path: '/login',
-        handler: loginController.authenticate,
-        config: {
-            description: 'Authenticate User',
-            notes: 'Get jwt by providing email(jd@gmail.com) & password(test@123)',
-            tags: ['api'],
-            auth: false,        //No auth for this end point
-            plugins: {
-                'hapi-swagger': {
-                    payloadType: 'form'
-                }
-            },
-            validate: {
-                payload: Joi.object({
-                    email: Joi.string(),
-                    password: Joi.string()
-                })
-            }
+      },
+      validate: {
+        payload: Joi.object({
+          email: Joi.string(),
+          password: Joi.string()
+        })
+      }
+    }
+  },
+  {
+    method: 'GET',
+    path: '/api/users',
+    handler: userController.getAllUsers,
+    config: {
+      tags: ['api', 'user'],
+      auth: 'jwt', // Specifiying the auth scheme , this is specified in server.js file
+      description: 'Get All Users',
+      validate: {
+        headers: Joi.object({
+          authorization: Joi.string().required() // Getting auth token in headers
+        }).options({ allowUnknown: true })
+      }
+    }
+  },
+  {
+    method: 'POST',
+    path: '/api/user',
+    handler: userController.createUser,
+    config: {
+      description: 'Create User',
+      notes: 'Create user by sending in the data along the token in headers',
+      tags: ['api', 'user'],
+      auth: 'jwt',
+      plugins: {
+        'hapi-swagger': {
+          payloadType: 'form'
         }
-    },
-    {
-        method: 'GET',
-        path: '/api/users',
-        handler: userController.getAllUsers,
-        config: {
-            tags: ['api','user'],
-            auth: 'jwt',            //Specifiying the auth scheme , this is specified in server.js file
-            description: 'Get All Users',
-            validate: {
-                headers: Joi.object({
-                    'authorization': Joi.string().required()    //Getting auth token in headers
-                }).options({ allowUnknown: true }),
-            }
-        }
-    },
-    {
-        method: 'POST',
-        path: '/api/user',
-        handler: userController.createUser,
-        config: {
-            description: 'Create User',
-            notes: 'Create user by sending in the data along the token in headers',
-            tags: ['api','user'],
-            auth: 'jwt',
-            plugins: {
-                'hapi-swagger': {
-                    payloadType: 'form'
-                }
-            },
-            validate: {
-                headers: Joi.object({
-                    'authorization': Joi.string().required()
-                }).options({ allowUnknown: true }),
-                payload: Joi.object({
-                    username: Joi.string(),
-                    email: Joi.string(),
-                    password: Joi.string(),
-                    phone: Joi.number(),
-                    dob: Joi.date(),
-                    sex: Joi.string(),
-                })
-            }
-        }
-    },
-    /*{
+      },
+      validate: {
+        headers: Joi.object({
+          authorization: Joi.string().required()
+        }).options({ allowUnknown: true }),
+        payload: Joi.object({
+          username: Joi.string(),
+          email: Joi.string(),
+          password: Joi.string(),
+          phone: Joi.number(),
+          dob: Joi.date(),
+          sex: Joi.string()
+        })
+      }
+    }
+  },
+  /* {
         method: 'DELETE',
         path: '/api/user/{id}',
         handler: userController.deleteUser,
@@ -106,250 +106,250 @@ module.exports = [
                 })
             }
         }
-    },*/
-    {
-        method: 'PUT',
-        path: '/api/user/{id}',
-        handler: userController.updateUser,
-        config: {
-            tags: ['api','user'],
-            description: 'Update user',
-            notes: ['Update user in our database'],
-            validate: {
-                headers: Joi.object({
-                    'authorization': Joi.string().required()
-                }).options({ allowUnknown: true }),
-                params: {
-                    id: Joi.string()
-                        .required()
-                        .description('ID of the user (UUID)')
-                },
-                payload: {
-                    username: Joi.string().required(),
-                    password: Joi.string().required(),
-                    phone: Joi.string().required(),
-                    dob: Joi.date(),
-                    sex: Joi.string()
-                }
-            }
+    }, */
+  {
+    method: 'PUT',
+    path: '/api/user/{id}',
+    handler: userController.updateUser,
+    config: {
+      tags: ['api', 'user'],
+      description: 'Update user',
+      notes: ['Update user in our database'],
+      validate: {
+        headers: Joi.object({
+          authorization: Joi.string().required()
+        }).options({ allowUnknown: true }),
+        params: {
+          id: Joi.string()
+            .required()
+            .description('ID of the user (UUID)')
         },
-    },
-    {
-        method: 'GET',
-        path: '/api/profile',
-        handler: profileController.getAllProfiles,
-        config: {
-            tags: ['api','profile'],
-            auth: 'jwt',            //Specifiying the auth scheme , this is specified in server.js file
-            description: 'Get All Profiles',
-            validate: {
-                headers: Joi.object({
-                    'authorization': Joi.string().required()    //Getting auth token in headers
-                }).options({ allowUnknown: true }),
-            }
+        payload: {
+          username: Joi.string().required(),
+          password: Joi.string().required(),
+          phone: Joi.string().required(),
+          dob: Joi.date(),
+          sex: Joi.string()
         }
-    },
-    {
-        method: 'POST',
-        path: '/api/profile',
-        handler: profileController.createProfile,
-        config: {
-            description: 'Create Profile',
-            notes: 'Create profile by sending in the data along the token in headers',
-            tags: ['api','profile'],
-            auth: 'jwt',
-            plugins: {
-                'hapi-swagger': {
-                    payloadType: 'form'
-                }
-            },
-            validate: {
-                headers: Joi.object({
-                    'authorization': Joi.string().required()
-                }).options({ allowUnknown: true }),
-                payload: Joi.object({
-                    user_id: Joi.string().required(),
-                    faculty: Joi.string().required(),
-                    university: Joi.string().required(),
-                    group: Joi.string(),
-                })
-            }
+      }
+    }
+  },
+  {
+    method: 'GET',
+    path: '/api/profile',
+    handler: profileController.getAllProfiles,
+    config: {
+      tags: ['api', 'profile'],
+      auth: 'jwt', // Specifiying the auth scheme , this is specified in server.js file
+      description: 'Get All Profiles',
+      validate: {
+        headers: Joi.object({
+          authorization: Joi.string().required() // Getting auth token in headers
+        }).options({ allowUnknown: true })
+      }
+    }
+  },
+  {
+    method: 'POST',
+    path: '/api/profile',
+    handler: profileController.createProfile,
+    config: {
+      description: 'Create Profile',
+      notes: 'Create profile by sending in the data along the token in headers',
+      tags: ['api', 'profile'],
+      auth: 'jwt',
+      plugins: {
+        'hapi-swagger': {
+          payloadType: 'form'
         }
-    },
-    {
-        method: 'PUT',
-        path: '/api/profile/{id}',
-        handler: profileController.updateProfile,
-        config: {
-            tags: ['api','profile'],
-            description: 'Update profile',
-            notes: ['Update profile in our database'],
-            validate: {
-                headers: Joi.object({
-                    'authorization': Joi.string().required()
-                }).options({ allowUnknown: true }),
-                params: {
-                    id: Joi.number()
-                        .required()
-                        .description('ID of the profile')
-                },
-                payload: {
-                    faculty: Joi.string().required(),
-                    university: Joi.string().required(),
-                    group: Joi.string(),
-                }
-            }
+      },
+      validate: {
+        headers: Joi.object({
+          authorization: Joi.string().required()
+        }).options({ allowUnknown: true }),
+        payload: Joi.object({
+          user_id: Joi.string().required(),
+          faculty: Joi.string().required(),
+          university: Joi.string().required(),
+          group: Joi.string()
+        })
+      }
+    }
+  },
+  {
+    method: 'PUT',
+    path: '/api/profile/{id}',
+    handler: profileController.updateProfile,
+    config: {
+      tags: ['api', 'profile'],
+      description: 'Update profile',
+      notes: ['Update profile in our database'],
+      validate: {
+        headers: Joi.object({
+          authorization: Joi.string().required()
+        }).options({ allowUnknown: true }),
+        params: {
+          id: Joi.number()
+            .required()
+            .description('ID of the profile')
         },
-    },
-    {
-        method: 'POST',
-        path: '/api/grade',
-        handler: gradeController.createGrade,
-        config: {
-            description: 'Create Grade',
-            notes: 'Create grade by sending in the data along the token in headers',
-            tags: ['api','grade'],
-            auth: 'jwt',
-            plugins: {
-                'hapi-swagger': {
-                    payloadType: 'form'
-                }
-            },
-            validate: {
-                headers: Joi.object({
-                    'authorization': Joi.string().required()
-                }).options({ allowUnknown: true }),
-                payload: Joi.object({
-                    id: Joi.number().required(),
-                    student_id: Joi.number().required(),
-                    teacher_id: Joi.number().required(),
-                    grade: Joi.number().required(),
-                    lesson: Joi.string().required(),
-                })
-            }
+        payload: {
+          faculty: Joi.string().required(),
+          university: Joi.string().required(),
+          group: Joi.string()
         }
-    },
-    {
-        method: 'PUT',
-        path: '/api/grade/{id}',
-        handler: gradeController.updateGrade,
-        config: {
-            tags: ['api','grade'],
-            description: 'Update grade',
-            notes: ['Update grade in our database'],
-            validate: {
-                headers: Joi.object({
-                    'authorization': Joi.string().required()
-                }).options({ allowUnknown: true }),
-                params: {
-                    id: Joi.string()
-                        .required()
-                        .description('ID of the grade')
-                },
-                payload: {
-                    grade: Joi.number().required(),
-                }
-            }
+      }
+    }
+  },
+  {
+    method: 'POST',
+    path: '/api/grade',
+    handler: gradeController.createGrade,
+    config: {
+      description: 'Create Grade',
+      notes: 'Create grade by sending in the data along the token in headers',
+      tags: ['api', 'grade'],
+      auth: 'jwt',
+      plugins: {
+        'hapi-swagger': {
+          payloadType: 'form'
+        }
+      },
+      validate: {
+        headers: Joi.object({
+          authorization: Joi.string().required()
+        }).options({ allowUnknown: true }),
+        payload: Joi.object({
+          id: Joi.number().required(),
+          student_id: Joi.number().required(),
+          teacher_id: Joi.number().required(),
+          grade: Joi.number().required(),
+          lesson: Joi.string().required()
+        })
+      }
+    }
+  },
+  {
+    method: 'PUT',
+    path: '/api/grade/{id}',
+    handler: gradeController.updateGrade,
+    config: {
+      tags: ['api', 'grade'],
+      description: 'Update grade',
+      notes: ['Update grade in our database'],
+      validate: {
+        headers: Joi.object({
+          authorization: Joi.string().required()
+        }).options({ allowUnknown: true }),
+        params: {
+          id: Joi.string()
+            .required()
+            .description('ID of the grade')
         },
-    },
-    {
-        method: 'GET',
-        path: '/api/grade/average/student/{id}',
-        handler: gradeController.getAverageGrade,
-        config: {
-            tags: ['api','grade'],
-            auth: 'jwt',            //Specifiying the auth scheme , this is specified in server.js file
-            description: 'Get Average grade by student',
-            validate: {
-                headers: Joi.object({
-                    'authorization': Joi.string().required()    //Getting auth token in headers
-                }).options({ allowUnknown: true }),
-                params: {
-                    id: Joi.number()
-                        .required()
-                        .description('ID of the student')
-                },
-            }
+        payload: {
+          grade: Joi.number().required()
         }
-    },
-    {
-        method: 'GET',
-        path: '/api/grade/average/faculty/{faculty}',
-        handler: gradeController.getAverageGrade,
-        config: {
-            tags: ['api','grade'],
-            auth: 'jwt',            //Specifiying the auth scheme , this is specified in server.js file
-            description: 'Get Average grade by lesson',
-            validate: {
-                headers: Joi.object({
-                    'authorization': Joi.string().required()    //Getting auth token in headers
-                }).options({ allowUnknown: true }),
-                params: {
-                    faculty: Joi.string()
-                        .required()
-                        .description('faculty name')
-                },
-            }
+      }
+    }
+  },
+  {
+    method: 'GET',
+    path: '/api/grade/average/student/{id}',
+    handler: gradeController.getAverageGrade,
+    config: {
+      tags: ['api', 'grade'],
+      auth: 'jwt', // Specifiying the auth scheme , this is specified in server.js file
+      description: 'Get Average grade by student',
+      validate: {
+        headers: Joi.object({
+          authorization: Joi.string().required() // Getting auth token in headers
+        }).options({ allowUnknown: true }),
+        params: {
+          id: Joi.number()
+            .required()
+            .description('ID of the student')
         }
-    },
-    {
-        method: 'GET',
-        path: '/api/grade/average/group/{group}',
-        handler: gradeController.getAverageGrade,
-        config: {
-            tags: ['api','grade'],
-            auth: 'jwt',            //Specifiying the auth scheme , this is specified in server.js file
-            description: 'Get Average grade by group',
-            validate: {
-                headers: Joi.object({
-                    'authorization': Joi.string().required()    //Getting auth token in headers
-                }).options({ allowUnknown: true }),
-                params: {
-                    group: Joi.string()
-                        .required()
-                        .description('group name')
-                },
-            }
+      }
+    }
+  },
+  {
+    method: 'GET',
+    path: '/api/grade/average/faculty/{faculty}',
+    handler: gradeController.getAverageGrade,
+    config: {
+      tags: ['api', 'grade'],
+      auth: 'jwt', // Specifiying the auth scheme , this is specified in server.js file
+      description: 'Get Average grade by lesson',
+      validate: {
+        headers: Joi.object({
+          authorization: Joi.string().required() // Getting auth token in headers
+        }).options({ allowUnknown: true }),
+        params: {
+          faculty: Joi.string()
+            .required()
+            .description('faculty name')
         }
-    },
-    {
-        method: 'GET',
-        path: '/api/grade/average/lesson/{lesson}',
-        handler: gradeController.getAverageGrade,
-        config: {
-            tags: ['api','grade'],
-            auth: 'jwt',            //Specifiying the auth scheme , this is specified in server.js file
-            description: 'Get Average grade by lesson',
-            validate: {
-                headers: Joi.object({
-                    'authorization': Joi.string().required()    //Getting auth token in headers
-                }).options({ allowUnknown: true }),
-                params: {
-                    lesson: Joi.string()
-                        .required()
-                        .description('lesson name')
-                },
-            }
+      }
+    }
+  },
+  {
+    method: 'GET',
+    path: '/api/grade/average/group/{group}',
+    handler: gradeController.getAverageGrade,
+    config: {
+      tags: ['api', 'grade'],
+      auth: 'jwt', // Specifiying the auth scheme , this is specified in server.js file
+      description: 'Get Average grade by group',
+      validate: {
+        headers: Joi.object({
+          authorization: Joi.string().required() // Getting auth token in headers
+        }).options({ allowUnknown: true }),
+        params: {
+          group: Joi.string()
+            .required()
+            .description('group name')
         }
-    },
-    {
-        method: 'GET',
-        path: '/api/grade/list/lesson/{lesson}',
-        handler: gradeController.getGradesList,
-        config: {
-            tags: ['api','grade'],
-            auth: 'jwt',            //Specifiying the auth scheme , this is specified in server.js file
-            description: 'Get list of your grades by lesson',
-            validate: {
-                headers: Joi.object({
-                    'authorization': Joi.string().required()    //Getting auth token in headers
-                }).options({ allowUnknown: true }),
-                params: {
-                    lesson: Joi.string()
-                        .required()
-                        .description('lesson name')
-                },
-            }
+      }
+    }
+  },
+  {
+    method: 'GET',
+    path: '/api/grade/average/lesson/{lesson}',
+    handler: gradeController.getAverageGrade,
+    config: {
+      tags: ['api', 'grade'],
+      auth: 'jwt', // Specifiying the auth scheme , this is specified in server.js file
+      description: 'Get Average grade by lesson',
+      validate: {
+        headers: Joi.object({
+          authorization: Joi.string().required() // Getting auth token in headers
+        }).options({ allowUnknown: true }),
+        params: {
+          lesson: Joi.string()
+            .required()
+            .description('lesson name')
         }
-    },
+      }
+    }
+  },
+  {
+    method: 'GET',
+    path: '/api/grade/list/lesson/{lesson}',
+    handler: gradeController.getGradesList,
+    config: {
+      tags: ['api', 'grade'],
+      auth: 'jwt', // Specifiying the auth scheme , this is specified in server.js file
+      description: 'Get list of your grades by lesson',
+      validate: {
+        headers: Joi.object({
+          authorization: Joi.string().required() // Getting auth token in headers
+        }).options({ allowUnknown: true }),
+        params: {
+          lesson: Joi.string()
+            .required()
+            .description('lesson name')
+        }
+      }
+    }
+  }
 ]
