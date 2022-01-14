@@ -49,7 +49,10 @@ module.exports = {
         let student = await Profiles.findOne({where: {id:req.params.id},raw:true});
         if((fromProfile.group == null && fromProfile.university == student.university && fromProfile.faculty == student.faculty)
         || (fromProfile.group != null && fromProfile.user_id == student.user_id)){
-            let result = await Grades.findAll();
+            let result = await Grades.findAll({
+                where :{student_id:req.params.id},
+                attributes: [[Sequelize.fn('avg', Sequelize.col('grade')),'avgGrade']]
+            });
             return result;
         }else{
             return { "error": "Teacher and student faculty and university must be the same / students can get only their own grades" };
@@ -66,9 +69,15 @@ module.exports = {
         let from = await Users.findOne({where: {username:actor},raw:true});
         let fromProfile = await Profiles.findOne({where: {user_id:from.id},raw:true});
         if(fromProfile.group == null && fromProfile.faculty == req.params.faculty){
-            let students = await  Grades.findAll({where:{faculty:req.params.faculty},raw:true})
-            console.log(students);
-            let result = await Grades.findAll();
+            let students = await  Profiles.findAll({where:{faculty:req.params.faculty},raw:true})
+            let idList = [];
+            students.forEach(element =>{
+                idList.push(element['id']);
+            })
+            let result = await Grades.findAll({
+                where :{student_id:idList},
+                attributes: [[Sequelize.fn('avg', Sequelize.col('grade')),'avgGrade']]
+            });
             return result;
         }else{
             return { "error": "Teacher faculty and specified faculty must be the same" };
