@@ -189,7 +189,7 @@ module.exports = [
                     'authorization': Joi.string().required()
                 }).options({ allowUnknown: true }),
                 params: {
-                    id: Joi.string()
+                    id: Joi.number()
                         .required()
                         .description('ID of the profile')
                 },
@@ -254,61 +254,81 @@ module.exports = [
     },
     {
         method: 'GET',
-        path: '/api/grade/average/student',
+        path: '/api/grade/average/student/{id}',
         handler: gradeController.getAverageGrade,
         config: {
             tags: ['api','grade'],
             auth: 'jwt',            //Specifiying the auth scheme , this is specified in server.js file
-            description: 'Get Average by student',
+            description: 'Get Average grade by student',
             validate: {
                 headers: Joi.object({
                     'authorization': Joi.string().required()    //Getting auth token in headers
                 }).options({ allowUnknown: true }),
+                params: {
+                    id: Joi.number()
+                        .required()
+                        .description('ID of the student')
+                },
             }
         }
     },
     {
         method: 'GET',
-        path: '/api/grade/average/faculty',
+        path: '/api/grade/average/faculty/{faculty}',
         handler: gradeController.getAverageGrade,
         config: {
             tags: ['api','grade'],
             auth: 'jwt',            //Specifiying the auth scheme , this is specified in server.js file
-            description: 'Get Average by lesson',
+            description: 'Get Average grade by lesson',
             validate: {
                 headers: Joi.object({
                     'authorization': Joi.string().required()    //Getting auth token in headers
                 }).options({ allowUnknown: true }),
+                params: {
+                    faculty: Joi.string()
+                        .required()
+                        .description('faculty name')
+                },
             }
         }
     },
     {
         method: 'GET',
-        path: '/api/grade/average/group',
+        path: '/api/grade/average/group/{group}',
         handler: gradeController.getAverageGrade,
         config: {
             tags: ['api','grade'],
             auth: 'jwt',            //Specifiying the auth scheme , this is specified in server.js file
-            description: 'Get Average by group',
+            description: 'Get Average grade by group',
             validate: {
                 headers: Joi.object({
                     'authorization': Joi.string().required()    //Getting auth token in headers
                 }).options({ allowUnknown: true }),
+                params: {
+                    group: Joi.string()
+                        .required()
+                        .description('group name')
+                },
             }
         }
     },
     {
         method: 'GET',
-        path: '/api/grade/average/lesson',
+        path: '/api/grade/average/lesson/{lesson}',
         handler: gradeController.getAverageGrade,
         config: {
             tags: ['api','grade'],
             auth: 'jwt',            //Specifiying the auth scheme , this is specified in server.js file
-            description: 'Get Average by lesson',
+            description: 'Get Average grade by lesson',
             validate: {
                 headers: Joi.object({
                     'authorization': Joi.string().required()    //Getting auth token in headers
                 }).options({ allowUnknown: true }),
+                params: {
+                    lesson: Joi.string()
+                        .required()
+                        .description('lesson name')
+                },
             }
         }
     },
