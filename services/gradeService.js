@@ -120,6 +120,23 @@ module.exports = {
             return { "error": "Only for students" };
         }
     },
+    async getGradesList(req, res) {
+        let token = req.headers['authorization'];
+        let base64Url = token.split('.')[1];
+        let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        let jsonPayload = decodeURIComponent(Buffer.from(base64, 'base64').toString().split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        let actor = JSON.parse(jsonPayload)['user']['username'];
+        let from = await Users.findOne({where: {username:actor},raw:true});
+        let fromProfile = await Profiles.findOne({where: {user_id:from.id},raw:true});
+        if(fromProfile.group != null){
+            let result = await Grades.findAll({where :{lesson:req.params.lesson, student_id:fromProfile.id}});
+            return result;
+        }else{
+            return { "error": "Only for students" };
+        }
+    },
     async deleteGrade(req, res) {
         return await Grades.destroy({
             where: {

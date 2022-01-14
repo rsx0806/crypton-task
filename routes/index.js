@@ -332,4 +332,24 @@ module.exports = [
             }
         }
     },
+    {
+        method: 'GET',
+        path: '/api/grade/list/lesson/{lesson}',
+        handler: gradeController.getGradesList,
+        config: {
+            tags: ['api','grade'],
+            auth: 'jwt',            //Specifiying the auth scheme , this is specified in server.js file
+            description: 'Get list of your grades by lesson',
+            validate: {
+                headers: Joi.object({
+                    'authorization': Joi.string().required()    //Getting auth token in headers
+                }).options({ allowUnknown: true }),
+                params: {
+                    lesson: Joi.string()
+                        .required()
+                        .description('lesson name')
+                },
+            }
+        }
+    },
 ]

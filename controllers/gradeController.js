@@ -32,6 +32,9 @@ module.exports = {
             }
         }
     },
+    async getGradesList(req, res){
+        return await gradeService.getGradesList(req, res);  //Create a user
+    },
     async createGrade(req, res){
         return await gradeService.createGrade(req, res);  //Create a user
     },
